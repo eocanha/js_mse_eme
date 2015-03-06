@@ -630,17 +630,27 @@ testBufferSize.prototype.onsourceopen = function() {
     var expectedTime = 0;
     sb.appendBuffer(xhr.getResponseData());
     sb.addEventListener('updateend', function onUpdate() {
-      if (sb.buffered.start(0) > 0 || expectedTime > sb.buffered.end(0) + 0.1) {
+      function onBufferLimitReached() {
         sb.removeEventListener('updateend', onUpdate);
 
         var MIN_SIZE = 12;
         runner.checkGE(expectedTime - sb.buffered.start(0), MIN_SIZE,
                        'Estimated source buffer size');
         runner.succeed();
+      }
+
+      if (sb.buffered.start(0) > 0 || expectedTime > sb.buffered.end(0) + 0.1) {
+        onBufferLimitReached();
       } else {
         expectedTime++;
         sb.timestampOffset = expectedTime;
-        sb.appendBuffer(xhr.getResponseData());
+        try {
+          sb.appendBuffer(xhr.getResponseData());
+        } catch (errorCode) {
+          if (errorCode.name == "QUOTA_EXCEEDED_ERR") {
+            onBufferLimitReached();
+          }
+        }
       }
     });
   });
