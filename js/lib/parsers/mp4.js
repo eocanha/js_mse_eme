@@ -100,5 +100,8 @@ function parseMp4(data) {
   }
   if (currPos !== sidxEnd)
     throw 'Bad end point' + currPos + sidxEnd;
+  
+  console.log("### parseMp4(): Parsed segments:");
+  console.log(JSON.stringify(res, null, 1));
   return res;
 }
