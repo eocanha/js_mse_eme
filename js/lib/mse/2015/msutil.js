@@ -97,6 +97,9 @@ function findBufferedRangeEndForTime(sb, t) {
     var s = buf.start(i), e = buf.end(i);
     dlog(4, 'findBuf: uid=' + sb.uid + ' index=' + i + ' time=' + t +
         ' start=' + s + ' end=' + e);
+    console.log('#@@@ findBuf: uid=' + sb.uid + ' index=' + i + ' time=' + t +
+        ' start=' + s + ' end=' + e);
+    // if (i>0) throw new Error("MORE THAN 1 BUFFER!!!"); // ### DEBUG
     if (t >= s && t <= e)
       return e;
   }
@@ -419,6 +422,7 @@ window.FixedAppendSize = function(upstream, size) {
     return this.upstream.seek(t, sb);
   };
   this.pull = function(cb) {
+    console.log("@@@ Chain.pull()");
     var len = this.appendSize();
     var self = this;
     pullBytes(this.upstream, len, this.cache, function(buf, cache) {
@@ -455,6 +459,12 @@ window.appendInit = function(mp, sb, chain, t, cb) {
 // 'sb' until the end of the buffered range contains time 't'.
 // It starts from the current playback location.
 window.appendUntil = function(timeoutManager, mp, sb, chain, t, cb) {
+  // mp: <video> tag
+  // sb: SourceBuffer
+  // chain:
+  // t: Time to append until
+  // cb: Callback then time t is reached
+  console.log("@@@ appendUntil: sb="+sb+", t="+t);
   if (!elementInBody(mp)) {
     cb();
     return;
@@ -483,12 +493,15 @@ window.appendUntil = function(timeoutManager, mp, sb, chain, t, cb) {
     function startedAppendBuffer(cb) {
       totalAppends++;
       postAppendBufferCb = cb;
+      console.log("@@@ AppendHandler.startedAppendBuffer(): totalAppends="+totalAppends);
     }
 
     function appendBufferFinished() {
       appendCbs++;
+      console.log("@@@ AppendHandler.appendBufferFinished(): BEGIN: appendCbs="+appendCbs+", current buffered_end="+buffered_end);
 
       buffered_end = findBufferedRangeEndForTime(sb, buffered_end);
+      console.log("@@@ AppendHandler.appendBufferFinished(): buffered_end="+buffered_end);
       if (buffered_end) {
         buffered_end = buffered_end + 0.1;
       } else {
@@ -496,18 +509,26 @@ window.appendUntil = function(timeoutManager, mp, sb, chain, t, cb) {
       }
 
       if (shouldCallCb && (appendCbs === totalAppends)) {
+        console.log("@@@ AppendHandler.appendBufferFinished(): Done");
         done();
       }
       else {
+        console.log("@@@ AppendHandler.appendBufferFinished(): Invoking configured callback, usually loop()");
         postAppendBufferCb();
       }
+      console.log("@@@ AppendHandler.appendBufferFinished(): END");
     }
 
     function done() {
+      console.log("@@@ AppendHandler.done(): totalAppends="+totalAppends+", appendCbs="+appendCbs);
+
       // calls the actual callback (cb) function when all the appends are done
       if (totalAppends === appendCbs) {
+        console.log("@@@ AppendHandler.done(): Removing 'update' event listener from sourcebuffer: won't call appendBufferFinished() anymore");
         sb.removeEventListener('update', appendBufferFinished);
+        console.log("@@@ AppendHandler.done(): Calling callback...");
         cb();
+        console.log("@@@ AppendHandler.done(): ...Called");
       }
 
       // Looks like there are outstanding append cbs; let those "append cbs"
@@ -515,6 +536,7 @@ window.appendUntil = function(timeoutManager, mp, sb, chain, t, cb) {
       shouldCallCb = true;
     }
 
+    console.log("@@@ AppendHandler: Adding 'update' event listener to sourcebuffer: will call appendBufferFinished()");
     sb.addEventListener('update', appendBufferFinished);
 
     return {
@@ -525,26 +547,35 @@ window.appendUntil = function(timeoutManager, mp, sb, chain, t, cb) {
   })(sb);
 
   (function loop(buffer) {
+    console.log("@@@ Loop...");
     if (!elementInBody(mp)) {
+      console.log("@@@ Loop: Element not in body, done");
       appendHandler.done();
       return;
     }
 
     if (buffer) {
       if (!safeAppend(sb, buffer)) {
+        console.log("@@@ Loop: Not safe append, done");
         appendHandler.done();
         return;
       }
+      console.log("@@@ Loop: Started append buffer: will call loop() on completion");
       appendHandler.startedAppendBuffer(loop);
 
       //timeoutManager.setTimeout(loop, 0);
     }
     else {
-      if (t >= buffered_end && !mp.error)
+      console.log("@@@ Loop: No buffer");
+      if (t >= buffered_end && !mp.error) {
+        console.log("@@@ Loop: time "+t+" >= buffered_end "+buffered_end+", pulling...");
         chain.pull(loop);
-      else
+      } else {
+        console.log("@@@ Loop: time "+t+" < buffered_end "+buffered_end+", done");
         appendHandler.done();
+      }
     }
+    console.log("### ...Loop.");
   })();
 };
 
