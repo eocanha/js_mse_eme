@@ -437,6 +437,8 @@ testSourceRemove.prototype.onsourceopen = function() {
 };
 
 
+// TEST 23/24
+
 var createDurationAfterAppendTest = function(streamName) {
   var test = createConformanceTest('DurationAfterAppend' +
       util.MakeCapitalName(StreamDef[streamName].name), 'MSE');
@@ -452,36 +454,63 @@ var createDurationAfterAppendTest = function(streamName) {
     // TODO: figure out duration
     var xhr = runner.XHRManager.createRequest(stream.src,
       function(e) {
+	console.log("@@@ XHR DATA RECEIVED");
         var data = xhr.getResponseData();
 
         var updateCb = function() {
+	  console.log("@@@ UPDATE CALLBACK");
+	  console.log("@@@ UNREGISTERING UPDATE EVENT LISTENER");
           sb.removeEventListener('update', updateCb);
+	  console.log("@@@ ABORTING");
           sb.abort();
 
           if (sb.updating) {
+	    console.log("@@@ IS UPDATING: FAIL");
             runner.fail();
           } else {
-            media.addEventListener(
+	    console.log("@@@ IS NOT UPDATING: CONTINUE");
+	    console.log("@@@ REGISTERING DURATION CHANGE EVENT LISTENER");
+
+	    media.addEventListener(
                 'durationchange', function onFirstDurationChange() {
               self.log('onFirstDurationChange called');
+	      console.log("@@@ UNREGISTERING DURATION CHANGE EVENT LISTENER");
               media.removeEventListener('durationchange',
                                         onFirstDurationChange);
+
               // This will fail if the buffer hasn't been trimmed.
+	      console.log("@@@ CHECKING IF BUFFERED AND MS.DURATION ARE COHERENT");
+	      console.log("@@@ sb.buffered.end(0) = "+sb.buffered.end(0));
+	      console.log("@@@ ms.duration = "+ms.duration);
               runner.checkApproxEq(ms.duration, sb.buffered.end(0),
                                    'ms.duration');
+	      console.log("@@@ REGISTERING UPDATE (2) EVENT LISTENER");
               sb.addEventListener('update', function() {
+		console.log("@@@ UPDATE (2)");
                 self.log('onSecondDurationChange called');
+		console.log("@@@ CHECKING IF BUFFERED AND MS.DURATION ARE COHERENT (2)");
+		console.log("@@@ sb.buffered.end(0) = "+sb.buffered.end(0));
+		console.log("@@@ ms.duration = "+ms.duration);
                 runner.checkApproxEq(ms.duration, sb.buffered.end(0),
                                      'ms.duration');
+		console.log("@@@ SUCCEED!!!");
                 runner.succeed();
               });
+	      console.log("@@@ APPENDING BUFFER (2)");
               sb.appendBuffer(data);
             });
+	    console.log("@@@ sb.buffered.end(0) = "+sb.buffered.end(0));
+	    console.log("@@@ ms.duration = "+ms.duration);
+	    console.log("@@@ CUTTING MEDIASOURCE DURATION");
             ms.duration = sb.buffered.end(0) / 2;
+	    console.log("@@@ sb.buffered.end(0) = "+sb.buffered.end(0));
+	    console.log("@@@ ms.duration = "+ms.duration);
           }
         };
 
+	console.log("@@@ REGISTERING UPDATE EVENT LISTENER");
         sb.addEventListener('update', updateCb);
+	console.log("@@@ APPENDING BUFFER");
         sb.appendBuffer(data);
       });
     xhr.send();
@@ -688,11 +717,12 @@ testSourceChain.prototype.onsourceopen = function() {
   });
 };
 
-
+// TEST 31 - VIDEO DIMENSION
 var testVideoDimension = createConformanceTest('VideoDimension', 'MSE');
 testVideoDimension.prototype.title =
     'Test if the readyState transition is correct.';
 testVideoDimension.prototype.onsourceopen = function() {
+  console.log("@@@ SOURCE OPEN");
   var runner = this.runner;
   var media = this.video;
   var videoChain = new ResetInit(new FixedAppendSize(
@@ -706,12 +736,14 @@ testVideoDimension.prototype.onsourceopen = function() {
 
   var totalSuccess = 0;
   function checkSuccess() {
+    console.log("@@@ CHECK SUCCESS: totalSuccess="+totalSuccess);
     totalSuccess++;
     if (totalSuccess == 2)
       runner.succeed();
   }
 
   media.addEventListener('loadedmetadata', function(e) {
+    console.log("@@@ LOADED METADATA");
     self.log('loadedmetadata called');
     runner.checkEq(media.videoWidth, 640, 'video width');
     runner.checkEq(media.videoHeight, 360, 'video height');
@@ -719,6 +751,7 @@ testVideoDimension.prototype.onsourceopen = function() {
   });
 
   runner.checkEq(media.readyState, media.HAVE_NOTHING, 'readyState');
+  console.log("@@@ CALLING APPEND INIT");
   appendInit(media, videoSb, videoChain, 0, checkSuccess);
 };
 
