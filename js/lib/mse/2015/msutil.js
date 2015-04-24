@@ -633,25 +633,37 @@ window.appendAt = function(timeoutManager, mp, sb, chain, t, gap, cb) {
 // resume in that case
 window.playThrough = function(timeoutManager, mp, lead, endTime, s1, f1, s2,
                               f2, cb) {
+  console.log("@@@ playThrough: lead="+lead+", endTime="+endTime+", s1="+s1+", s2="+s2);
   var yieldTime = 0.03;
 
   function loop() {
-    if (!elementInBody(mp))
+    if (!elementInBody(mp)) {
+      console.log("@@@ playThrough loop(): Element not in body, returning");
       return;
-    if (mp.currentTime <= endTime && !mp.error)
+    }
+    if (mp.currentTime <= endTime && !mp.error) {
+      console.log("@@@ playThrough loop(): Enqueuing a new playThrough() to run in "+yieldTime+"s");
       timeoutManager.setTimeout(playThrough.bind(
           null, timeoutManager, mp, lead, endTime, s1, f1, s2, f2, cb),
           yieldTime * 1000);
-    else
+    } else {
+      console.log("@@@ playThrough loop(): Calling the playThrough completion callback");
       cb();
+    }
   };
+
+  console.log("@@@ playThrough: appending at (currentTime) t="+mp.currentTime+", gap="+(yieldTime+lead));
+
   appendAt(timeoutManager, mp, s1, f1, mp.currentTime, yieldTime + lead,
            function() {
-             if (s2)
+	     if (s2) {
+	       console.log("@@@ playThrough: appendAt completed: appending again at t="+mp.currentTime+", gap="+(yieldTime+lead)+" and will loop() after completion");
                appendAt(timeoutManager, mp, s2, f2, mp.currentTime,
                         yieldTime + lead, loop);
-             else
+	     } else {
+	       console.log("@@@ playThrough: appendAt completed: manually calling loop()");  
                loop();
+	     }
            });
 };
 
