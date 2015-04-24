@@ -1307,45 +1307,64 @@ testSourceSeek.prototype.onsourceopen = function() {
   var videoChain = new ResetInit(new FileSource(
       StreamDef.VideoNormal.src, runner.XHRManager, runner.timeouts));
   var videoSb = this.ms.addSourceBuffer(StreamDef.VideoType);
-  var audioChain = new ResetInit(new FileSource(
-      StreamDef.AudioNormal.src, runner.XHRManager, runner.timeouts));
-  var audioSb = this.ms.addSourceBuffer(StreamDef.AudioType);
+  // var audioChain = new ResetInit(new FileSource(
+  //     StreamDef.AudioNormal.src, runner.XHRManager, runner.timeouts));
+  // var audioSb = this.ms.addSourceBuffer(StreamDef.AudioType);
   var self = this;
 
   this.ms.duration = 100000000;  // Ensure that we can seek to any position.
 
+  console.log("@@@ SEEK TEST START");
+
   appendUntil(runner.timeouts, media, videoSb, videoChain, 20, function() {
-    appendUntil(runner.timeouts, media, audioSb, audioChain, 20, function() {
+    console.log("@@@ VIDEO APPEND UNTIL COMPLETED");
+    // appendUntil(runner.timeouts, media, audioSb, audioChain, 20, function() {
+      console.log("@@@ AUDIO APPEND UNTIL COMPLETED");
+      console.log("@@@ SEEK TO 17S");
       self.log('Seek to 17s');
       callAfterLoadedMetaData(media, function() {
+	console.log("@@@ CALL AFTER LOADED METADATA CALLED");
         media.currentTime = 17;
         media.play();
+	console.log("@@@ PLAY");
         playThrough(
             runner.timeouts, media, 10, 19,
-            videoSb, videoChain, audioSb, audioChain, function() {
+            videoSb, videoChain, /* audioSb */ null, /* audioChain */ null, function() {
+	  console.log("@@@ PLAYTHROUGH 19 COMPLETED");
           runner.checkGE(media.currentTime, 19, 'currentTime');
+	  /*
           self.log('Seek to 28s');
+	  console.log("@@@ SEEK TO 53S");
           media.currentTime = 53;
+	  console.log("@@@ SEEK TO 58S");
           media.currentTime = 58;
           playThrough(
               runner.timeouts, media, 10, 60,
               videoSb, videoChain, audioSb, audioChain, function() {
+	    console.log("@@@ PLAYTHROUGH 60 COMPLETED");
             runner.checkGE(media.currentTime, 60, 'currentTime');
             self.log('Seek to 7s');
+	    console.log("@@@ SEEK TO 0S");
             media.currentTime = 0;
+	    console.log("@@@ SEEK TO 7S");
             media.currentTime = 7;
             videoChain.seek(7, videoSb);
             audioChain.seek(7, audioSb);
             playThrough(runner.timeouts, media, 10, 9,
                 videoSb, videoChain, audioSb, audioChain, function() {
+	      console.log("@@@ PLAYTHROUGH 9 COMPLETED");
               runner.checkGE(media.currentTime, 9, 'currentTime');
+	  */
+	      console.log("@@@ SUCCEED");
               runner.succeed();
+	  /*
             });
           });
+	  */
         });
       });
     });
-  });
+  // });
 };
 
 
