@@ -1332,7 +1332,6 @@ testSourceSeek.prototype.onsourceopen = function() {
             videoSb, videoChain, /* audioSb */ null, /* audioChain */ null, function() {
 	  console.log("@@@ PLAYTHROUGH 19 COMPLETED");
           runner.checkGE(media.currentTime, 19, 'currentTime');
-	  /*
           self.log('Seek to 28s');
 	  console.log("@@@ SEEK TO 53S");
           media.currentTime = 53;
@@ -1340,7 +1339,7 @@ testSourceSeek.prototype.onsourceopen = function() {
           media.currentTime = 58;
           playThrough(
               runner.timeouts, media, 10, 60,
-              videoSb, videoChain, audioSb, audioChain, function() {
+              videoSb, videoChain, /* audioSb */ null, /* audioChain */ null, function() {
 	    console.log("@@@ PLAYTHROUGH 60 COMPLETED");
             runner.checkGE(media.currentTime, 60, 'currentTime');
             self.log('Seek to 7s');
@@ -1349,18 +1348,15 @@ testSourceSeek.prototype.onsourceopen = function() {
 	    console.log("@@@ SEEK TO 7S");
             media.currentTime = 7;
             videoChain.seek(7, videoSb);
-            audioChain.seek(7, audioSb);
+            // audioChain.seek(7, audioSb);
             playThrough(runner.timeouts, media, 10, 9,
-                videoSb, videoChain, audioSb, audioChain, function() {
+                videoSb, videoChain, /* audioSb */ null, /* audioChain */ null, function() {
 	      console.log("@@@ PLAYTHROUGH 9 COMPLETED");
               runner.checkGE(media.currentTime, 9, 'currentTime');
-	  */
 	      console.log("@@@ SUCCEED");
               runner.succeed();
-	  /*
             });
           });
-	  */
         });
       });
     });
