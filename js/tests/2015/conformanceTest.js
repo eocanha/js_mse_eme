@@ -1296,6 +1296,229 @@ testSeekTimeUpdate.prototype.onsourceopen = function() {
   xhr.send();
 };
 
+// ### BEGIN DEBUG ###
+
+var testSourceMiniSeekVideo15 = createConformanceTest('MiniSeekVideo15', 'MSE DEBUG');
+testSourceMiniSeekVideo15.prototype.title = 'MiniSeekVideo15';
+testSourceMiniSeekVideo15.prototype.onsourceopen = function() {
+  var runner = this.runner;
+  var media = this.video;
+  var videoChain = new ResetInit(new FileSource(
+      StreamDef.VideoNormal.src, runner.XHRManager, runner.timeouts));
+  var videoSb = this.ms.addSourceBuffer(StreamDef.VideoType);
+  var self = this;
+
+  this.ms.duration = 100000000;  // Ensure that we can seek to any position.
+
+  appendUntil(runner.timeouts, media, videoSb, videoChain, 20, function() {
+    console.log("@@@ LOADED");
+    callAfterLoadedMetaData(media, function() {
+      console.log("@@@ PLAY THROUGH 5s (10s PREBUFFER)");
+      media.play();
+      playThrough(
+	  runner.timeouts, media, 10, 5,
+	  videoSb, videoChain, null, null, function() {
+	runner.checkGE(media.currentTime, 5, 'currentTime');
+	console.log("@@@ SEEK TO 15s");
+	media.currentTime = 15;
+	console.log("@@@ PLAY THROUGH 25s (10s PREBUFFER)");
+	playThrough(
+	    runner.timeouts, media, 10, 25,
+	    videoSb, videoChain, null, null, function() {
+	  runner.checkGE(media.currentTime, 25, 'currentTime');
+	  runner.succeed();
+	});
+      });
+    });
+  });
+};
+
+var testSourceMiniSeekVideo40 = createConformanceTest('MiniSeekVideo40', 'MSE DEBUG');
+testSourceMiniSeekVideo40.prototype.title = 'MiniSeekVideo40';
+testSourceMiniSeekVideo40.prototype.onsourceopen = function() {
+  var runner = this.runner;
+  var media = this.video;
+  var videoChain = new ResetInit(new FileSource(
+      StreamDef.VideoNormal.src, runner.XHRManager, runner.timeouts));
+  var videoSb = this.ms.addSourceBuffer(StreamDef.VideoType);
+  var self = this;
+
+  this.ms.duration = 100000000;  // Ensure that we can seek to any position.
+
+  appendUntil(runner.timeouts, media, videoSb, videoChain, 20, function() {
+    console.log("@@@ LOADED");
+    callAfterLoadedMetaData(media, function() {
+      console.log("@@@ PLAY THROUGH 5s (10s PREBUFFER)");
+      media.play();
+      playThrough(
+	  runner.timeouts, media, 10, 5,
+	  videoSb, videoChain, null, null, function() {
+	runner.checkGE(media.currentTime, 5, 'currentTime');
+	console.log("@@@ SEEK TO 40s");
+	media.currentTime = 40;
+	console.log("@@@ PLAY THROUGH 55s (10s PREBUFFER)");
+	playThrough(
+	    runner.timeouts, media, 10, 55,
+	    videoSb, videoChain, null, null, function() {
+	  runner.checkGE(media.currentTime, 55, 'currentTime');
+	  runner.succeed();
+	});
+      });
+    });
+  });
+};
+
+var testSourceMiniSeekAudio15 = createConformanceTest('MiniSeekAudio15', 'MSE DEBUG');
+testSourceMiniSeekAudio15.prototype.title = 'MiniSeekAudio15';
+testSourceMiniSeekAudio15.prototype.onsourceopen = function() {
+  var runner = this.runner;
+  var media = this.video;
+  var audioChain = new ResetInit(new FileSource(
+      StreamDef.AudioNormal.src, runner.XHRManager, runner.timeouts));
+  var audioSb = this.ms.addSourceBuffer(StreamDef.AudioType);
+  var self = this;
+
+  this.ms.duration = 100000000;  // Ensure that we can seek to any position.
+
+  appendUntil(runner.timeouts, media, audioSb, audioChain, 20, function() {
+    console.log("@@@ LOADED");
+    callAfterLoadedMetaData(media, function() {
+      console.log("@@@ PLAY THROUGH 5s (10s PREBUFFER)");
+      media.play();
+      playThrough(
+	  runner.timeouts, media, 10, 5,
+	  audioSb, audioChain, null, null, function() {
+	runner.checkGE(media.currentTime, 5, 'currentTime');
+	console.log("@@@ SEEK TO 15s");
+	media.currentTime = 15;
+	console.log("@@@ PLAY THROUGH 25s (10s PREBUFFER)");
+	playThrough(
+	    runner.timeouts, media, 10, 25,
+	    audioSb, audioChain, null, null, function() {
+	  runner.checkGE(media.currentTime, 25, 'currentTime');
+	  runner.succeed();
+	});
+      });
+    });
+  });
+};
+
+var testSourceMiniSeekAudio40 = createConformanceTest('MiniSeekAudio40', 'MSE DEBUG');
+testSourceMiniSeekAudio40.prototype.title = 'MiniSeekAudio40';
+testSourceMiniSeekAudio40.prototype.onsourceopen = function() {
+  var runner = this.runner;
+  var media = this.video;
+  var audioChain = new ResetInit(new FileSource(
+      StreamDef.AudioNormal.src, runner.XHRManager, runner.timeouts));
+  var audioSb = this.ms.addSourceBuffer(StreamDef.AudioType);
+  var self = this;
+
+  this.ms.duration = 100000000;  // Ensure that we can seek to any position.
+
+  appendUntil(runner.timeouts, media, audioSb, audioChain, 20, function() {
+    console.log("@@@ LOADED");
+    callAfterLoadedMetaData(media, function() {
+      console.log("@@@ PLAY THROUGH 5s (10s PREBUFFER)");
+      media.play();
+      playThrough(
+	  runner.timeouts, media, 10, 5,
+	  audioSb, audioChain, null, null, function() {
+	runner.checkGE(media.currentTime, 5, 'currentTime');
+	console.log("@@@ SEEK TO 40s");
+	media.currentTime = 40;
+	console.log("@@@ PLAY THROUGH 55s (10s PREBUFFER)");
+	playThrough(
+	    runner.timeouts, media, 10, 55,
+	    audioSb, audioChain, null, null, function() {
+	  runner.checkGE(media.currentTime, 55, 'currentTime');
+	  runner.succeed();
+	});
+      });
+    });
+  });
+};
+
+var testSourceMiniSeekAudioVideo15 = createConformanceTest('MiniSeekAudioVideo15', 'MSE DEBUG');
+testSourceMiniSeekAudioVideo15.prototype.title = 'MiniSeekAudioVideo15';
+testSourceMiniSeekAudioVideo15.prototype.onsourceopen = function() {
+  var runner = this.runner;
+  var media = this.video;
+  var videoChain = new ResetInit(new FileSource(
+      StreamDef.VideoNormal.src, runner.XHRManager, runner.timeouts));
+  var videoSb = this.ms.addSourceBuffer(StreamDef.VideoType);
+  var audioChain = new ResetInit(new FileSource(
+      StreamDef.AudioNormal.src, runner.XHRManager, runner.timeouts));
+  var audioSb = this.ms.addSourceBuffer(StreamDef.AudioType);
+  var self = this;
+
+  this.ms.duration = 100000000;  // Ensure that we can seek to any position.
+
+  appendUntil(runner.timeouts, media, videoSb, videoChain, 20, function() {
+    appendUntil(runner.timeouts, media, audioSb, audioChain, 20, function() {
+      console.log("@@@ LOADED");
+      callAfterLoadedMetaData(media, function() {
+	console.log("@@@ PLAY THROUGH 5s (10s PREBUFFER)");
+        media.play();
+        playThrough(
+            runner.timeouts, media, 10, 5,
+            videoSb, videoChain, audioSb, audioChain, function() {
+          runner.checkGE(media.currentTime, 5, 'currentTime');
+          console.log("@@@ SEEK TO 15s");
+	  media.currentTime = 15;
+	  console.log("@@@ PLAY THROUGH 25s (10s PREBUFFER)");
+	  playThrough(
+              runner.timeouts, media, 10, 25,
+              videoSb, videoChain, audioSb, audioChain, function() {
+            runner.checkGE(media.currentTime, 25, 'currentTime');
+	    runner.succeed();
+          });
+        });
+      });
+    });
+  });
+};
+
+var testSourceMiniSeekAudioVideo40 = createConformanceTest('MiniSeekAudioVideo40', 'MSE DEBUG');
+testSourceMiniSeekAudioVideo40.prototype.title = 'MiniSeekAudioVideo40';
+testSourceMiniSeekAudioVideo40.prototype.onsourceopen = function() {
+  var runner = this.runner;
+  var media = this.video;
+  var videoChain = new ResetInit(new FileSource(
+      StreamDef.VideoNormal.src, runner.XHRManager, runner.timeouts));
+  var videoSb = this.ms.addSourceBuffer(StreamDef.VideoType);
+  var audioChain = new ResetInit(new FileSource(
+      StreamDef.AudioNormal.src, runner.XHRManager, runner.timeouts));
+  var audioSb = this.ms.addSourceBuffer(StreamDef.AudioType);
+  var self = this;
+
+  this.ms.duration = 100000000;  // Ensure that we can seek to any position.
+
+  appendUntil(runner.timeouts, media, videoSb, videoChain, 20, function() {
+    appendUntil(runner.timeouts, media, audioSb, audioChain, 20, function() {
+      console.log("@@@ LOADED");
+      callAfterLoadedMetaData(media, function() {
+	console.log("@@@ PLAY THROUGH 5s (10s PREBUFFER)");
+        media.play();
+        playThrough(
+            runner.timeouts, media, 10, 5,
+            videoSb, videoChain, audioSb, audioChain, function() {
+          runner.checkGE(media.currentTime, 5, 'currentTime');
+          console.log("@@@ SEEK TO 40s");
+	  media.currentTime = 40;
+	  console.log("@@@ PLAY THROUGH 55s (10s PREBUFFER)");
+	  playThrough(
+              runner.timeouts, media, 10, 55,
+              videoSb, videoChain, audioSb, audioChain, function() {
+            runner.checkGE(media.currentTime, 55, 'currentTime');
+	    runner.succeed();
+          });
+        });
+      });
+    });
+  });
+};
+
+// ### END DEBUG ###
 
 var testSourceSeek = createConformanceTest('Seek', 'MSE');
 testSourceSeek.prototype.title = 'Test if we can seek during playing. It' +
